@@ -3,221 +3,59 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Değerini Öğren</title>
 
 <style>
-*{
-box-sizing:border-box;
-}
-
 body{
-font-family:Arial,sans-serif;
-background:#f3f4f6;
-margin:0;
-padding:20px;
-color:#222;
+  font-family: Arial, sans-serif;
+  background:#f5f5f5;
+  margin:0;
+  text-align:center;
 }
-
-.box{
-max-width:500px;
-margin:auto;
-background:#fff;
-padding:25px;
-border-radius:22px;
-box-shadow:0 5px 20px rgba(0,0,0,.08);
+header{
+  background:#6c4cff;
+  color:white;
+  padding:25px 10px;
 }
-
-h1{
-text-align:center;
-font-size:30px;
-margin-bottom:10px;
+main{
+  max-width:500px;
+  margin:25px auto;
+  padding:20px;
 }
-
-.aciklama{
-text-align:center;
-line-height:1.5;
-margin-bottom:25px;
+.card{
+  background:white;
+  padding:25px;
+  border-radius:18px;
+  box-shadow:0 3px 15px #ccc;
 }
-
-label{
-display:block;
-font-weight:bold;
-margin-top:18px;
-margin-bottom:7px;
-}
-
-input,select{
-width:100%;
-padding:14px;
-border:1px solid #ccc;
-border-radius:10px;
-font-size:16px;
-background:white;
-}
-
-#foto{
-display:none;
-width:100%;
-max-height:300px;
-object-fit:contain;
-margin-top:18px;
-border-radius:12px;
-}
-
 button{
-width:100%;
-padding:17px;
-margin-top:22px;
-border:0;
-border-radius:12px;
-background:#202020;
-color:white;
-font-size:18px;
-font-weight:bold;
+  background:#6c4cff;
+  color:white;
+  border:none;
+  padding:14px 25px;
+  border-radius:10px;
+  font-size:17px;
+  margin-top:15px;
 }
-
-#sonuc{
-display:none;
-margin-top:22px;
-padding:18px;
-background:#f0f7f1;
-border-radius:12px;
-font-size:18px;
-line-height:1.5;
-text-align:center;
+input{
+  margin-top:15px;
 }
-
-.uyari{
-font-size:12px;
-color:#777;
-margin-top:18px;
-text-align:center;
+#foto{
+  max-width:100%;
+  margin-top:20px;
+  border-radius:12px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="box">
+<header>
+<h1>💰 Değerini Öğren</h1>
+<p>Eşyanın fotoğrafını yükle, değerini araştırmaya başla.</p>
+</header>
 
-<h1>🔎 Değerini Öğren</h1>
+<main>
+<div class="card">
 
-<p class="aciklama">
-Eşyanın fotoğrafını yükle, türünü ve durumunu seç.
-Tahmini ikinci el değer aralığını öğren.
-</p>
-
-<label>📷 Eşyanın fotoğrafı</label>
-<input id="dosya" type="file" accept="image/*">
-
-<img id="foto">
-
-<label>📦 Eşya türü</label>
-<select id="kategori">
-<option value="">Seçiniz</option>
-<option value="telefon">Telefon</option>
-<option value="televizyon">Televizyon</option>
-<option value="bilgisayar">Bilgisayar / Tablet</option>
-<option value="mobilya">Mobilya</option>
-<option value="beyazesya">Beyaz eşya</option>
-<option value="taki">Takı / Aksesuar</option>
-<option value="antika">Antika / Koleksiyon</option>
-<option value="diger">Diğer</option>
-</select>
-
-<label>✨ Durumu</label>
-<select id="durum">
-<option value="">Seçiniz</option>
-<option value="yeni">Yeni gibi</option>
-<option value="iyi">İyi</option>
-<option value="orta">Orta</option>
-<option value="yipranmis">Yıpranmış</option>
-</select>
-
-<button onclick="degerHesapla()">Değerini Öğren</button>
-
-<div id="sonuc"></div>
-
-<p class="uyari">
-Gösterilen fiyat yaklaşık bir tahmindir; marka, model, yaş ve piyasa koşullarına göre değişebilir.
-</p>
-
-</div>
-
-<script>
-
-const dosya = document.getElementById("dosya");
-const foto = document.getElementById("foto");
-
-dosya.addEventListener("change", function(){
-
-const secilen = this.files[0];
-
-if(secilen){
-foto.src = URL.createObjectURL(secilen);
-foto.style.display = "block";
-}
-
-});
-
-function degerHesapla(){
-
-const kategori = document.getElementById("kategori").value;
-const durum = document.getElementById("durum").value;
-const sonuc = document.getElementById("sonuc");
-
-if(!dosya.files[0]){
-alert("Önce bir fotoğraf seç.");
-return;
-}
-
-if(!kategori){
-alert("Eşya türünü seç.");
-return;
-}
-
-if(!durum){
-alert("Eşyanın durumunu seç.");
-return;
-}
-
-const fiyatlar = {
-telefon:12000,
-televizyon:10000,
-bilgisayar:15000,
-mobilya:7000,
-beyazesya:10000,
-taki:5000,
-antika:8000,
-diger:4000
-};
-
-const oranlar = {
-yeni:1,
-iyi:0.75,
-orta:0.50,
-yipranmis:0.30
-};
-
-let orta = fiyatlar[kategori] * oranlar[durum];
-
-let min = Math.round(orta * 0.80);
-let max = Math.round(orta * 1.20);
-
-sonuc.style.display = "block";
-
-sonuc.innerHTML =
-"💰 <b>Tahmini değer</b><br><br>" +
-min.toLocaleString("tr-TR") +
-" TL – " +
-max.toLocaleString("tr-TR") +
-" TL<br><br>" +
-"<small>Daha doğru sonuç için sonraki aşamada marka, model ve yapay zekâ analizi eklenecek.</small>";
-
-}
-
-</script>
-
-</body>
-</html>
+<h2
