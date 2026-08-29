@@ -122,6 +122,19 @@ document.getElementById("ara").onclick=()=>{
   sonuc.innerHTML=
     "✅ "+tur+" seçildi.<br>🔎 Değer araştırması için hazır.";
 };
+document.getElementById("ara").onclick = async () => {
+  const sonuc = document.getElementById("sonuc");
+  sonuc.innerHTML = "🔎 Araştırılıyor...";
+
+  try {
+    const cevap = await fetch("/api");
+    const veri = await cevap.json();
+    sonuc.innerHTML = "✅ " + veri.message;
+  } catch (hata) {
+    sonuc.innerHTML = "❌ Araştırma sırasında hata oluştu.";
+  }
+};
+  
 </script>
 
 </body>
