@@ -1,57 +1,158 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Değerini Öğren</title>
 
-<title>Değerini Öğren</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      text-align: center;
+    }
 
-<style>
-* {
-  box-sizing: border-box;
-}
+    header {
+      background: #6c4cff;
+      color: white;
+      padding: 45px 20px;
+    }
 
-body {
-  margin: 0;
-  background: #f5f5f5;
-  font-family: Arial, sans-serif;
-  text-align: center;
-}
+    header h1 {
+      margin: 0 0 15px;
+      font-size: 38px;
+    }
 
-header {
-  background: #6c4cff;
-  color: white;
-  padding: 45px 20px;
-}
+    .box {
+      width: 85%;
+      max-width: 450px;
+      margin: 35px auto;
+      background: white;
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    }
 
-header h1 {
-  margin: 0 0 18px;
-  font-size: 38px;
-}
+    #photo {
+      display: none;
+    }
 
-header p {
-  margin: 0;
-  font-size: 18px;
-  line-height: 1.4;
-}
+    .photo-button {
+      display: block;
+      background: #6c4cff;
+      color: white;
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 20px;
+      font-weight: bold;
+    }
 
-.container {
-  padding: 35px 20px;
-}
+    #preview {
+      display: none;
+      width: 100%;
+      margin-top: 20px;
+      border-radius: 12px;
+    }
 
-.upload-box {
-  background: white;
-  max-width: 500px;
-  margin: auto;
-  padding: 25px;
-  border-radius: 22px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-}
+    select, button {
+      width: 100%;
+      margin-top: 18px;
+      padding: 15px;
+      font-size: 17px;
+      border-radius: 10px;
+    }
 
-#photo {
-  display: none;
-}
+    button {
+      border: none;
+      background: #6c4cff;
+      color: white;
+      font-weight: bold;
+    }
 
-.upload-button {
-  display: block;
-  background: #6c4
+    #result {
+      margin-top: 20px;
+      font-size: 17px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>💰 Değerini Öğren</h1>
+    <p>Eşyanın fotoğrafını yükle, değerini araştırmaya başla.</p>
+  </header>
+
+  <div class="box">
+
+    <label for="photo" class="photo-button">
+      📷 Fotoğraf Seç
+    </label>
+
+    <input type="file" id="photo" accept="image/*">
+
+    <img id="preview" alt="Seçilen fotoğraf">
+
+    <select id="category">
+      <option value="">Eşya türünü seç</option>
+      <option>Elektronik</option>
+      <option>Mobilya</option>
+      <option>Giyim</option>
+      <option>Takı</option>
+      <option>Oyuncak</option>
+      <option>Antika</option>
+      <option>Ev eşyası</option>
+      <option>Diğer</option>
+    </select>
+
+    <button onclick="showResult()">
+      🔍 Değerini Araştır
+    </button>
+
+    <div id="result"></div>
+
+  </div>
+
+  <script>
+    const photo = document.getElementById("photo");
+    const preview = document.getElementById("preview");
+    const result = document.getElementById("result");
+
+    photo.addEventListener("change", function () {
+      const file = this.files[0];
+
+      if (!file) return;
+
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+        preview.style.display = "block";
+        result.innerHTML = "✅ Fotoğraf seçildi.";
+      };
+
+      reader.readAsDataURL(file);
+    });
+
+    function showResult() {
+      const category = document.getElementById("category").value;
+
+      if (!photo.files.length) {
+        result.innerHTML = "📷 Önce fotoğraf seç.";
+        return;
+      }
+
+      if (!category) {
+        result.innerHTML = "📦 Eşya türünü seç.";
+        return;
+      }
+
+      result.innerHTML =
+        "✅ Fotoğraf hazır.<br>" +
+        "Kategori: <b>" + category + "</b>";
+    }
+  </script>
+
+</body>
+</html>
