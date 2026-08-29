@@ -1,158 +1,169 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Değerini Öğren</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      text-align: center;
-    }
+<title>Değerini Öğren</title>
 
-    header {
-      background: #6c4cff;
-      color: white;
-      padding: 45px 20px;
-    }
+<style>
+* {
+  box-sizing: border-box;
+}
 
-    header h1 {
-      margin: 0 0 15px;
-      font-size: 38px;
-    }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+  text-align: center;
+}
 
-    .box {
-      width: 85%;
-      max-width: 450px;
-      margin: 35px auto;
-      background: white;
-      padding: 25px;
-      border-radius: 20px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-    }
+header {
+  background: #6c4cff;
+  color: white;
+  padding: 45px 20px;
+}
 
-    #photo {
-      display: none;
-    }
+header h1 {
+  margin: 0 0 15px;
+  font-size: 38px;
+}
 
-    .photo-button {
-      display: block;
-      background: #6c4cff;
-      color: white;
-      padding: 16px;
-      border-radius: 12px;
-      font-size: 20px;
-      font-weight: bold;
-    }
+header p {
+  font-size: 18px;
+  line-height: 1.4;
+}
 
-    #preview {
-      display: none;
-      width: 100%;
-      margin-top: 20px;
-      border-radius: 12px;
-    }
+.box {
+  width: 92%;
+  max-width: 500px;
+  margin: 35px auto;
+  padding: 25px;
+  background: white;
+  border-radius: 22px;
+  box-shadow: 0 7px 20px rgba(0,0,0,0.15);
+}
 
-    select, button {
-      width: 100%;
-      margin-top: 18px;
-      padding: 15px;
-      font-size: 17px;
-      border-radius: 10px;
-    }
+#photo {
+  display: none;
+}
 
-    button {
-      border: none;
-      background: #6c4cff;
-      color: white;
-      font-weight: bold;
-    }
+.photo-button {
+  display: block;
+  width: 100%;
+  padding: 18px;
+  background: #6c4cff;
+  color: white;
+  border-radius: 14px;
+  font-size: 21px;
+  font-weight: bold;
+  cursor: pointer;
+}
 
-    #result {
-      margin-top: 20px;
-      font-size: 17px;
-    }
-  </style>
+#preview {
+  display: none;
+  width: 100%;
+  max-height: 500px;
+  object-fit: contain;
+  margin-top: 20px;
+  border-radius: 15px;
+}
+
+select {
+  width: 100%;
+  margin-top: 20px;
+  padding: 16px;
+  font-size: 18px;
+  border: 2px solid #333;
+  border-radius: 12px;
+  background: white;
+}
+
+#researchButton {
+  width: 100%;
+  margin-top: 20px;
+  padding: 18px;
+  border: none;
+  border-radius: 14px;
+  background: #6c4cff;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#researchButton:active {
+  transform: scale(0.98);
+}
+
+#result {
+  margin-top: 22px;
+  padding: 10px;
+  font-size: 18px;
+  line-height: 1.5;
+}
+</style>
 </head>
 
 <body>
 
-  <header>
-    <h1>💰 Değerini Öğren</h1>
-    <p>Eşyanın fotoğrafını yükle, değerini araştırmaya başla.</p>
-  </header>
+<header>
+  <h1>💰 Değerini Öğren</h1>
+  <p>Eşyanın fotoğrafını yükle, değerini araştırmaya başla.</p>
+</header>
 
-  <div class="box">
+<div class="box">
 
-    <label for="photo" class="photo-button">
-      📷 Fotoğraf Seç
-    </label>
+  <label for="photo" class="photo-button">
+    📷 Fotoğraf Seç
+  </label>
 
-    <input type="file" id="photo" accept="image/*">
+  <input
+    type="file"
+    id="photo"
+    accept="image/*"
+  >
 
-    <img id="preview" alt="Seçilen fotoğraf">
+  <img id="preview" alt="Seçilen fotoğraf">
 
-    <select id="category">
-      <option value="">Eşya türünü seç</option>
-      <option>Elektronik</option>
-      <option>Mobilya</option>
-      <option>Giyim</option>
-      <option>Takı</option>
-      <option>Oyuncak</option>
-      <option>Antika</option>
-      <option>Ev eşyası</option>
-      <option>Diğer</option>
-    </select>
+  <select id="category">
+    <option value="">Eşya türünü seç</option>
+    <option value="Elektronik">Elektronik</option>
+    <option value="Mobilya">Mobilya</option>
+    <option value="Giyim">Giyim</option>
+    <option value="Takı">Takı / Aksesuar</option>
+    <option value="Oyuncak">Oyuncak</option>
+    <option value="Antika">Antika</option>
+    <option value="Ev eşyası">Ev eşyası</option>
+    <option value="Diğer">Diğer</option>
+  </select>
 
-    <button onclick="showResult()">
-      🔍 Değerini Araştır
-    </button>
+  <button id="researchButton" type="button">
+    🔍 Değerini Araştır
+  </button>
 
-    <div id="result"></div>
+  <div id="result"></div>
 
-  </div>
+</div>
 
-  <script>
-    const photo = document.getElementById("photo");
-    const preview = document.getElementById("preview");
-    const result = document.getElementById("result");
+<script>
+const photoInput = document.getElementById("photo");
+const preview = document.getElementById("preview");
+const category = document.getElementById("category");
+const button = document.getElementById("researchButton");
+const result = document.getElementById("result");
 
-    photo.addEventListener("change", function () {
-      const file = this.files[0];
+photoInput.addEventListener("change", function() {
 
-      if (!file) return;
+  const file = photoInput.files[0];
 
-      const reader = new FileReader();
+  if (!file) {
+    return;
+  }
 
-      reader.onload = function (e) {
-        preview.src = e.target.result;
-        preview.style.display = "block";
-        result.innerHTML = "✅ Fotoğraf seçildi.";
-      };
+  const reader = new FileReader();
 
-      reader.readAsDataURL(file);
-    });
-
-    function showResult() {
-      const category = document.getElementById("category").value;
-
-      if (!photo.files.length) {
-        result.innerHTML = "📷 Önce fotoğraf seç.";
-        return;
-      }
-
-      if (!category) {
-        result.innerHTML = "📦 Eşya türünü seç.";
-        return;
-      }
-
-      result.innerHTML =
-        "✅ Fotoğraf hazır.<br>" +
-        "Kategori: <b>" + category + "</b>";
-    }
-  </script>
-
-</body>
-</html>
+  reader.onload = function(event) {
+    preview.src = event.target.result;
+    preview.style.display = "block";
+    result.innerHTML = "
