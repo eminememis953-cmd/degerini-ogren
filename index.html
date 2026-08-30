@@ -1,141 +1,174 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Değerini Öğren</title>
+export default async function handler(req, res) {
 
-<style>
-body{
-  margin:0;
-  font-family:Arial;
-  text-align:center;
-  background:#f5f5f5;
-}
-header{
-  background:#6c4cff;
-  color:white;
-  padding:35px 15px;
-}
-.box{
-  margin:30px auto;
-  padding:20px;
-  width:85%;
-  max-width:450px;
-  background:white;
-  border-radius:18px;
-}
-input{display:none;}
+  res.setHeader(
+    "Access-Control-Allow-Origin",
+    "*"
+  );
 
-label,button{
-  display:block;
-  width:100%;
-  padding:16px;
-  margin-top:15px;
-  background:#6c4cff;
-  color:white;
-  border:0;
-  border-radius:12px;
-  font-size:18px;
-  font-weight:bold;
-}
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "POST, OPTIONS"
+  );
 
-select{
-  width:100%;
-  padding:15px;
-  margin-top:18px;
-  font-size:17px;
-}
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type"
+  );
 
-img{
-  display:none;
-  width:100%;
-  margin-top:18px;
-  border-radius:12px;
-}
-
-#sonuc{
-  margin-top:18px;
-  font-size:17px;
-}
-</style>
-</head>
-
-<body>
-
-<header>
-<h1>💰 Değerini Öğren</h1>
-<p>Eşyanın fotoğrafını yükle, değerini araştır.</p>
-</header>
-
-<div class="box">
-
-<label for="foto">📷 Fotoğraf Seç</label>
-<input id="foto" type="file" accept="image/*">
-
-<img id="resim">
-
-<select id="tur">
-<option value="">Eşya türünü seç</option>
-<option>Elektronik</option>
-<option>Mobilya</option>
-<option>Giyim</option>
-<option>Takı</option>
-<option>Oyuncak</option>
-<option>Antika</option>
-<option>Ev eşyası</option>
-<option>Diğer</option>
-</select>
-
-<button id="ara">🔍 Değerini Araştır</button>
-
-<div id="sonuc"></div>
-
-</div>
-
-<script>
-const foto=document.getElementById("foto");
-const resim=document.getElementById("resim");
-const sonuc=document.getElementById("sonuc");
-
-foto.onchange=()=>{
-  if(!foto.files[0]) return;
-
-  resim.src=URL.createObjectURL(foto.files[0]);
-  resim.style.display="block";
-  sonuc.innerHTML="✅ Fotoğraf seçildi.";
-};
-
-document.getElementById("ara").onclick=()=>{
-  const tur=document.getElementById("tur").value;
-
-  if(!foto.files.length){
-    sonuc.innerHTML="📷 Önce fotoğraf seç.";
-    return;
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
   }
 
-  if(!tur){
-    sonuc.innerHTML="📦 Önce eşya türünü seç.";
-    return;
+  if (req.method !== "POST") {
+    return res.status(405).json({
+      error: "Sadece POST isteği kullanılabilir."
+    });
   }
-
-  sonuc.innerHTML=
-    "✅ "+tur+" seçildi.<br>🔎 Değer araştırması için hazır.";
-};
-document.getElementById("ara").onclick = async () => {
-  const sonuc = document.getElementById("sonuc");
-  sonuc.innerHTML = "🔎 Araştırılıyor...";
 
   try {
-    const cevap = await fetch("/api");
-    const veri = await cevap.json();
-    sonuc.innerHTML = "✅ " + veri.message;
-  } catch (hata) {
-    sonuc.innerHTML = "❌ Araştırma sırasında hata oluştu.";
-  }
-};
-  
-</script>
 
-</body>
-</html>
+    const { image, category } = req.body || {};
+
+    if (!image) {
+      return res.status(400).json({
+        error: "Fotoğraf gönderilmedi."
+      });
+    }
+
+    if (!category) {
+      return res.status(400).json({
+        error: "Eşya türü seçilmedi."
+      });
+    }
+
+    if (!process.env.OPENAI_API_KEY) {
+      return res.status(500).json({
+        error: "OpenAI anahtarı sunucuda tanımlı değil."
+      });
+    }
+
+    const prompt = `
+Bu fotoğraftaki eşyayı dikkatlice incele.
+
+Eşya kategorisi: ${category}
+
+Türkiye'deki kullanıcı için Türkçe cevap ver.
+
+Şunları sırayla yaz:
+
+1. Eşyanın ne olduğunu tahmin et.
+2. Görülebiliyorsa marka ve modelini belirt.
+3. Fotoğraftan görülebilen durumunu değerlendir.
+4. Sıfır ürünse tahmini değer aralığını TL olarak yaz.
+5. İkinci el ise tahmini satış fiyatı aralığını TL olarak yaz.
+6. Koleksiyonluk veya antika olma ihtimali varsa belirt.
+7. Fiyatı etkileyebilecek önemli ayrıntıları söyle.
+8. Emin olmadığın bilgileri kesinmiş gibi yazma.
+
+Cevabı sade, anlaşılır ve çok uzun olmayacak şekilde ver.
+
+En sonda:
+"Tahmini Değer: ... TL - ... TL"
+şeklinde kısa bir özet yaz.
+
+Bu bir görsel tahmindir; kesin ekspertiz sonucu değildir.
+`;
+
+    const openaiCevap = await fetch(
+      "https://api.openai.com/v1/responses",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization":
+            `Bearer ${process.env.OPENAI_API_KEY}`
+        },
+
+        body: JSON.stringify({
+          model: "gpt-5.6-luna",
+
+          input: [
+            {
+              role: "user",
+
+              content: [
+                {
+                  type: "input_text",
+                  text: prompt
+                },
+
+                {
+                  type: "input_image",
+                  image_url: image
+                }
+              ]
+            }
+          ],
+
+          max_output_tokens: 700
+        })
+      }
+    );
+
+    const data = await openaiCevap.json();
+
+    if (!openaiCevap.ok) {
+
+      console.error(
+        "OpenAI hatası:",
+        data
+      );
+
+      return res.status(openaiCevap.status).json({
+        error:
+          data?.error?.message ||
+          "Yapay zekâ servisine bağlanılamadı."
+      });
+    }
+
+    let metin = "";
+
+    if (Array.isArray(data.output)) {
+
+      for (const item of data.output) {
+
+        if (
+          item.type === "message" &&
+          Array.isArray(item.content)
+        ) {
+
+          for (const content of item.content) {
+
+            if (
+              content.type === "output_text" &&
+              content.text
+            ) {
+              metin += content.text;
+            }
+          }
+        }
+      }
+    }
+
+    if (!metin) {
+      return res.status(500).json({
+        error:
+          "Yapay zekâ cevap verdi ancak sonuç okunamadı."
+      });
+    }
+
+    return res.status(200).json({
+      message: metin.trim()
+    });
+
+  } catch (hata) {
+
+    console.error(hata);
+
+    return res.status(500).json({
+      error:
+        "Sunucuda beklenmeyen bir hata oluştu."
+    });
+  }
+}
