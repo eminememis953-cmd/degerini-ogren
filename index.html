@@ -1,5 +1,409 @@
 export default async function handler(req, res) {
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <title>Değerini Öğren</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #222;
+      text-align: center;
+    }
+
+    header {
+      background: #6c4cff;
+      color: white;
+      padding: 45px 20px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 36px;
+    }
+
+    header p {
+      margin-top: 18px;
+      margin-bottom: 0;
+      font-size: 18px;
+    }
+
+    .box {
+      width: 90%;
+      max-width: 480px;
+      margin: 30px auto;
+      padding: 24px;
+      background: white;
+      border-radius: 22px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    label {
+      display: block;
+      width: 100%;
+      padding: 18px;
+      background: #6c4cff;
+      color: white;
+      border-radius: 15px;
+      font-size: 19px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    select {
+      width: 100%;
+      margin-top: 20px;
+      padding: 16px;
+      border: 1px solid #777;
+      border-radius: 10px;
+      background: white;
+      font-size: 17px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 20px;
+      padding: 18px;
+      border: none;
+      border-radius: 15px;
+      background: #6c4cff;
+      color: white;
+      font-size: 19px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+    }
+
+    #resim {
+      display: none;
+      width: 100%;
+      max-height: 350px;
+      object-fit: contain;
+      margin-top: 20px;
+      border-radius: 14px;
+    }
+
+    #sonuc {
+      margin-top: 22px;
+      padding: 5px;
+      text-align: left;
+      font-size: 17px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    .bilgi {
+      margin-top: 18px;
+      color: #777;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>💰 Değerini Öğren</h1>
+    <p>Eşyanın fotoğrafını yükle, yapay zekâ değerini araştırsın.</p>
+  </header>
+
+  <div class="box">
+
+    <label for="foto">
+      📷 Fotoğraf Seç
+    </label>
+
+    <input
+      id="foto"
+      type="file"
+      accept="image/*"
+    >
+
+    <img
+      id="resim"
+      alt="Seçilen eşya"
+    >
+
+    <select id="tur">
+      <option value="">Eşya türünü seç</option>
+      <option value="Elektronik">Elektronik</option>
+      <option value="Mobilya">Mobilya</option>
+      <option value="Giyim">Giyim</option>
+      <option value="Takı">Takı</option>
+      <option value="Oyuncak">Oyuncak</option>
+      <option value="Antika">Antika</option>
+      <option value="Ev eşyası">Ev eşyası</option>
+      <option value="Diğer">Diğer</option>
+    </select>
+
+    <button id="ara">
+      🔎 Değerini Araştır
+    </button>
+
+    <div id="sonuc"></div>
+
+    <div class="bilgi">
+      Yapay zekânın verdiği fiyat yaklaşık bir tahmindir.
+      Kesin ekspertiz veya satış fiyatı değildir.
+    </div>
+
+  </div>
+
+  <script>
+    const API_ADRESI =
+      "https://degerini-ogren.vercel.app/api";
+
+    const foto =
+      document.getElementById("foto");
+
+    const resim =
+      document.getElementById("resim");
+
+    const tur =
+      document.getElementById("tur");
+
+    const sonuc =
+      document.getElementById("sonuc");
+
+    const ara =
+      document.getElementById("ara");
+
+    let hazirResim = "";
+
+    foto.addEventListener(
+      "change",
+      async function () {
+
+        const dosya = foto.files[0];
+
+        if (!dosya) {
+          return;
+        }
+
+        sonuc.textContent =
+          "📷 Fotoğraf hazırlanıyor...";
+
+        try {
+
+          hazirResim =
+            await resmiHazirla(dosya);
+
+          resim.src = hazirResim;
+          resim.style.display = "block";
+
+          sonuc.textContent =
+            "✅ Fotoğraf hazır.\nŞimdi eşya türünü seçip Değerini Araştır'a bas.";
+
+        } catch (hata) {
+
+          sonuc.textContent =
+            "❌ Fotoğraf hazırlanamadı.";
+
+        }
+      }
+    );
+
+    ara.addEventListener(
+      "click",
+      async function () {
+
+        if (!hazirResim) {
+
+          sonuc.textContent =
+            "📷 Önce bir fotoğraf seç.";
+
+          return;
+        }
+
+        if (!tur.value) {
+
+          sonuc.textContent =
+            "📦 Önce eşya türünü seç.";
+
+          return;
+        }
+
+        ara.disabled = true;
+
+        ara.textContent =
+          "⏳ Araştırılıyor...";
+
+        sonuc.textContent =
+          "🤖 Yapay zekâ fotoğrafı inceliyor...\nLütfen biraz bekle.";
+
+        try {
+
+          const cevap =
+            await fetch(
+              API_ADRESI,
+              {
+                method: "POST",
+
+                headers: {
+                  "Content-Type":
+                    "application/json"
+                },
+
+                body: JSON.stringify({
+                  image: hazirResim,
+                  category: tur.value
+                })
+              }
+            );
+
+          const veri =
+            await cevap.json();
+
+          if (!cevap.ok) {
+
+            throw new Error(
+              veri.error ||
+              "Araştırma yapılamadı."
+            );
+          }
+
+          sonuc.textContent =
+            veri.message ||
+            "Sonuç alınamadı.";
+
+        } catch (hata) {
+
+          console.error(hata);
+
+          sonuc.textContent =
+            "❌ Yapay zekâya bağlanırken hata oluştu.\n" +
+            "API bağlantısını kontrol edeceğiz.";
+
+        } finally {
+
+          ara.disabled = false;
+
+          ara.textContent =
+            "🔎 Değerini Araştır";
+        }
+      }
+    );
+
+    function resmiHazirla(dosya) {
+
+      return new Promise(
+        (resolve, reject) => {
+
+          const reader =
+            new FileReader();
+
+          reader.onload =
+            function (event) {
+
+              const img =
+                new Image();
+
+              img.onload =
+                function () {
+
+                  let width =
+                    img.width;
+
+                  let height =
+                    img.height;
+
+                  const maxBoyut =
+                    1200;
+
+                  if (
+                    width > maxBoyut ||
+                    height > maxBoyut
+                  ) {
+
+                    const oran =
+                      Math.min(
+                        maxBoyut / width,
+                        maxBoyut / height
+                      );
+
+                    width =
+                      Math.round(
+                        width * oran
+                      );
+
+                    height =
+                      Math.round(
+                        height * oran
+                      );
+                  }
+
+                  const canvas =
+                    document.createElement(
+                      "canvas"
+                    );
+
+                  canvas.width =
+                    width;
+
+                  canvas.height =
+                    height;
+
+                  const ctx =
+                    canvas.getContext(
+                      "2d"
+                    );
+
+                  ctx.drawImage(
+                    img,
+                    0,
+                    0,
+                    width,
+                    height
+                  );
+
+                  const sonucResim =
+                    canvas.toDataURL(
+                      "image/jpeg",
+                      0.82
+                    );
+
+                  resolve(
+                    sonucResim
+                  );
+                };
+
+              img.onerror =
+                reject;
+
+              img.src =
+                event.target.result;
+            };
+
+          reader.onerror =
+            reject;
+
+          reader.readAsDataURL(
+            dosya
+          );
+        }
+      );
+    }
+  </script>
+
+</body>
+</html>
   res.setHeader(
     "Access-Control-Allow-Origin",
     "*"
