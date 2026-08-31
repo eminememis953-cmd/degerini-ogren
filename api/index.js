@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-   
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -10,40 +9,27 @@ export default async function handler(req, res) {
 
   if (req.method !== "POST") {
     return res.status(405).json({
-      error: "Sadece POST isteği kabul edilir."
+      error: "Sadece POST isteği kabul ediliyor."
     });
   }
 
   try {
-    const { image, category } = req.body;
+    const { image, category } = req.body || {};
 
     if (!image) {
       return res.status(400).json({
         error: "Fotoğraf bulunamadı."
       });
     }
-  
-      
-    
 
-    if (!process.env.GEMINI_API_KEY) {
+    if (!process.env.OPENROUTER_API_KEY) {
       return res.status(500).json({
-        error: "GEMINI_API_KEY bulunamadı."
+        error: "OPENROUTER_API_KEY bulunamadı."
       });
     }
 
-    const mimeMatch = image.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,/);
-
-    const mimeType = mimeMatch
-      ? mimeMatch[1]
-      : "image/jpeg";
-
-    const base64Data = image.includes(",")
-      ? image.split(",")[1]
-      : image;
-
     const prompt = `
-Bu fotoğraftaki ${category || "ürünü"} dikkatlice incele.
+Bu fotoğraftaki ${category || "ürünü"} incele.
 
 Türkçe cevap ver.
 
@@ -53,30 +39,35 @@ Türkçe cevap ver.
 - İkinci el piyasasında yaklaşık değeri
 - Tahmini fiyat aralığı
 
+Fiyatı Türk Lirası (TL) olarak belirt.
 Kesin fiyat bildiğini iddia etme.
-Kısa, anlaşılır ve kullanıcı dostu bir cevap ver.
+Fotoğraftan anlaşılmayan marka, model veya özellikleri uydurma.
+Kısa, anlaşılır ve kullanıcı dostu cevap ver.
 `;
 
     const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+      "https://openrouter.ai/api/v1/chat/completions",
       {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": process.env.GEMINI_API_KEY
+          "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          contents: [
+          model: "openrouter/free",
+          messages: [
             {
-              parts: [
+              role: "user",
+              content: [
                 {
-                  inlineData: {
-                    mimeType: mimeType,
-                    data: base64Data
-                  }
+                  type: "text",
+                  text: prompt
                 },
                 {
-                  text: prompt
+                  type: "image_url",
+                  image_url: {
+                    url: image
+                  }
                 }
               ]
             }
@@ -88,24 +79,20 @@ Kısa, anlaşılır ve kullanıcı dostu bir cevap ver.
     const data = await response.json();
 
     if (!response.ok) {
-      console.error("Gemini API error:", data);
+      console.error("OpenRouter API error:", data);
 
       return res.status(response.status).json({
         error:
           data?.error?.message ||
-          "Gemini API isteği başarısız oldu."
+          "OpenRouter API isteği başarısız oldu."
       });
     }
 
-    const result =
-      data?.candidates?.[0]?.content?.parts
-        ?.map((part) => part.text || "")
-        .join("\n")
-        .trim();
+    const result = data?.choices?.[0]?.message?.content;
 
     if (!result) {
       return res.status(500).json({
-        error: "Gemini cevap verdi ancak sonuç metni alınamadı."
+        error: "Yapay zekâdan cevap alınamadı."
       });
     }
 
@@ -114,10 +101,10 @@ Kısa, anlaşılır ve kullanıcı dostu bir cevap ver.
     });
 
   } catch (error) {
-    console.error("Sunucu hatası:", error);
+    console.error("API error:", error);
 
     return res.status(500).json({
-      error: error?.message || "Sunucuda beklenmeyen bir hata oluştu."
+      error: "Yapay zekâya bağlanırken hata oluştu."
     });
   }
 }
