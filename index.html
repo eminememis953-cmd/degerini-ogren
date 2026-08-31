@@ -1,9 +1,12 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>Değerini Öğren</title>
 
@@ -23,28 +26,32 @@
     header {
       background: #6c4cff;
       color: white;
-      padding: 45px 20px;
+      padding: 38px 20px;
     }
 
     header h1 {
       margin: 0;
-      font-size: 36px;
+      font-size: 34px;
     }
 
     header p {
-      margin-top: 18px;
-      margin-bottom: 0;
-      font-size: 18px;
+      margin: 12px 0 0;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .container {
+      padding: 28px 18px 45px;
     }
 
     .box {
-      width: 90%;
+      width: 100%;
       max-width: 480px;
-      margin: 30px auto;
+      margin: 0 auto;
       padding: 24px;
       background: white;
       border-radius: 22px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.12);
     }
 
     input[type="file"] {
@@ -54,13 +61,22 @@
     label {
       display: block;
       width: 100%;
-      padding: 18px;
+      padding: 17px;
       background: #6c4cff;
       color: white;
-      border-radius: 15px;
-      font-size: 19px;
+      border-radius: 14px;
+      font-size: 18px;
       font-weight: bold;
       cursor: pointer;
+    }
+
+    #resim {
+      display: none;
+      width: 100%;
+      max-height: 350px;
+      object-fit: contain;
+      margin-top: 20px;
+      border-radius: 14px;
     }
 
     select {
@@ -88,15 +104,7 @@
 
     button:disabled {
       opacity: 0.6;
-    }
-
-    #resim {
-      display: none;
-      width: 100%;
-      max-height: 350px;
-      object-fit: contain;
-      margin-top: 20px;
-      border-radius: 14px;
+      cursor: default;
     }
 
     #sonuc {
@@ -106,13 +114,14 @@
       font-size: 17px;
       line-height: 1.6;
       white-space: pre-wrap;
+      overflow-wrap: anywhere;
     }
 
     .bilgi {
-      margin-top: 18px;
+      margin-top: 20px;
       color: #777;
       font-size: 13px;
-      line-height: 1.4;
+      line-height: 1.5;
     }
   </style>
 </head>
@@ -121,54 +130,61 @@
 
   <header>
     <h1>💰 Değerini Öğren</h1>
-    <p>Eşyanın fotoğrafını yükle, yapay zekâ değerini araştırsın.</p>
+
+    <p>
+      Eşyanın fotoğrafını yükle,
+      yapay zekâ yaklaşık değerini araştırsın.
+    </p>
   </header>
 
-  <div class="box">
+  <div class="container">
 
-    <label for="foto">
-      📷 Fotoğraf Seç
-    </label>
+    <div class="box">
 
-    <input
-      id="foto"
-      type="file"
-      accept="image/*"
-    >
+      <label for="foto">
+        📷 Fotoğraf Seç
+      </label>
 
-    <img
-      id="resim"
-      alt="Seçilen eşya"
-    >
+      <input
+        id="foto"
+        type="file"
+        accept="image/*"
+      >
 
-    <select id="tur">
-      <option value="">Eşya türünü seç</option>
-      <option value="Elektronik">Elektronik</option>
-      <option value="Mobilya">Mobilya</option>
-      <option value="Giyim">Giyim</option>
-      <option value="Takı">Takı</option>
-      <option value="Oyuncak">Oyuncak</option>
-      <option value="Antika">Antika</option>
-      <option value="Ev eşyası">Ev eşyası</option>
-      <option value="Diğer">Diğer</option>
-    </select>
+      <img
+        id="resim"
+        alt="Seçilen eşya"
+      >
 
-    <button id="ara">
-      🔎 Değerini Araştır
-    </button>
+      <select id="tur">
+        <option value="">Eşya türünü seç</option>
+        <option value="Elektronik">Elektronik</option>
+        <option value="Mobilya">Mobilya</option>
+        <option value="Giyim">Giyim</option>
+        <option value="Takı">Takı</option>
+        <option value="Oyuncak">Oyuncak</option>
+        <option value="Antika">Antika</option>
+        <option value="Ev eşyası">Ev eşyası</option>
+        <option value="Diğer">Diğer</option>
+      </select>
 
-    <div id="sonuc"></div>
+      <button id="ara">
+        🔎 Değerini Araştır
+      </button>
 
-    <div class="bilgi">
-      Yapay zekânın verdiği fiyat yaklaşık bir tahmindir.
-      Kesin ekspertiz veya satış fiyatı değildir.
+      <div id="sonuc"></div>
+
+      <div class="bilgi">
+        Yapay zekânın verdiği fiyat yaklaşık bir tahmindir.
+        Kesin ekspertiz veya satış fiyatı değildir.
+      </div>
+
     </div>
 
   </div>
 
   <script>
-    const API_ADRESI =
-      "https://degerini-ogren.vercel.app/api";
+    const API_ADRESI = "/api";
 
     const foto =
       document.getElementById("foto");
@@ -187,11 +203,13 @@
 
     let hazirResim = "";
 
+
     foto.addEventListener(
       "change",
       async function () {
 
-        const dosya = foto.files[0];
+        const dosya =
+          foto.files[0];
 
         if (!dosya) {
           return;
@@ -205,20 +223,32 @@
           hazirResim =
             await resmiHazirla(dosya);
 
-          resim.src = hazirResim;
-          resim.style.display = "block";
+          resim.src =
+            hazirResim;
+
+          resim.style.display =
+            "block";
 
           sonuc.textContent =
             "✅ Fotoğraf hazır.\nŞimdi eşya türünü seçip Değerini Araştır'a bas.";
 
         } catch (hata) {
 
-          sonuc.textContent =
-            "❌ Fotoğraf hazırlanamadı.";
+          console.error(hata);
 
+          hazirResim = "";
+
+          resim.removeAttribute("src");
+
+          resim.style.display =
+            "none";
+
+          sonuc.textContent =
+            "❌ Fotoğraf hazırlanamadı. Başka bir fotoğraf deneyin.";
         }
       }
     );
+
 
     ara.addEventListener(
       "click",
@@ -246,7 +276,7 @@
           "⏳ Araştırılıyor...";
 
         sonuc.textContent =
-          "🤖 Yapay zekâ fotoğrafı inceliyor...\nLütfen biraz bekle.";
+          "🤖 Yapay zekâ fotoğrafı inceliyor...";
 
         try {
 
@@ -268,28 +298,58 @@
               }
             );
 
-          const veri =
-            await cevap.json();
+
+          let veri;
+
+          try {
+
+            veri =
+              await cevap.json();
+
+          } catch {
+
+            throw new Error(
+              "Sunucudan geçerli cevap alınamadı."
+            );
+          }
+
 
           if (!cevap.ok) {
 
             throw new Error(
-              veri.error ||
-              "Araştırma yapılamadı."
+              veri?.error ||
+              `Araştırma yapılamadı. Hata kodu: ${cevap.status}`
             );
           }
 
+
+          const gelenSonuc =
+            veri?.result ||
+            veri?.message ||
+            "";
+
+
+          if (!gelenSonuc) {
+
+            throw new Error(
+              "Yapay zekâ cevap verdi ancak sonuç metni alınamadı."
+            );
+          }
+
+
           sonuc.textContent =
-            veri.message ||
-            "Sonuç alınamadı.";
+            gelenSonuc;
 
         } catch (hata) {
 
           console.error(hata);
 
           sonuc.textContent =
-            "❌ Yapay zekâya bağlanırken hata oluştu.\n" +
-            "API bağlantısını kontrol edeceğiz.";
+            "❌ Yapay zekâya bağlanırken bir sorun oluştu.\n" +
+            (
+              hata?.message ||
+              "Lütfen tekrar deneyin."
+            );
 
         } finally {
 
@@ -301,19 +361,22 @@
       }
     );
 
+
     function resmiHazirla(dosya) {
 
       return new Promise(
-        (resolve, reject) => {
+        function (resolve, reject) {
 
           const reader =
             new FileReader();
+
 
           reader.onload =
             function (event) {
 
               const img =
                 new Image();
+
 
               img.onload =
                 function () {
@@ -326,6 +389,7 @@
 
                   const maxBoyut =
                     1200;
+
 
                   if (
                     width > maxBoyut ||
@@ -349,6 +413,7 @@
                       );
                   }
 
+
                   const canvas =
                     document.createElement(
                       "canvas"
@@ -360,10 +425,24 @@
                   canvas.height =
                     height;
 
+
                   const ctx =
                     canvas.getContext(
                       "2d"
                     );
+
+
+                  if (!ctx) {
+
+                    reject(
+                      new Error(
+                        "Fotoğraf işleme başlatılamadı."
+                      )
+                    );
+
+                    return;
+                  }
+
 
                   ctx.drawImage(
                     img,
@@ -373,26 +452,46 @@
                     height
                   );
 
+
                   const sonucResim =
                     canvas.toDataURL(
                       "image/jpeg",
-                      0.82
+                      0.78
                     );
+
 
                   resolve(
                     sonucResim
                   );
                 };
 
+
               img.onerror =
-                reject;
+                function () {
+
+                  reject(
+                    new Error(
+                      "Fotoğraf açılamadı."
+                    )
+                  );
+                };
+
 
               img.src =
                 event.target.result;
             };
 
+
           reader.onerror =
-            reject;
+            function () {
+
+              reject(
+                new Error(
+                  "Fotoğraf okunamadı."
+                )
+              );
+            };
+
 
           reader.readAsDataURL(
             dosya
@@ -404,175 +503,3 @@
 
 </body>
 </html>
- <!-- res.setHeader(
-    "Access-Control-Allow-Origin",
-    "*"
-  );
-
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "POST, OPTIONS"
-  );
-
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Content-Type"
-  );
-
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
-
-  if (req.method !== "POST") {
-    return res.status(405).json({
-      error: "Sadece POST isteği kullanılabilir."
-    });
-  }
-
-  try {
-
-    const { image, category } = req.body || {};
-
-    if (!image) {
-      return res.status(400).json({
-        error: "Fotoğraf gönderilmedi."
-      });
-    }
-
-    if (!category) {
-      return res.status(400).json({
-        error: "Eşya türü seçilmedi."
-      });
-    }
-
-    if (!process.env.OPENAI_API_KEY) {
-      return res.status(500).json({
-        error: "OpenAI anahtarı sunucuda tanımlı değil."
-      });
-    }
-
-    const prompt = `
-Bu fotoğraftaki eşyayı dikkatlice incele.
-
-Eşya kategorisi: ${category}
-
-Türkiye'deki kullanıcı için Türkçe cevap ver.
-
-Şunları sırayla yaz:
-
-1. Eşyanın ne olduğunu tahmin et.
-2. Görülebiliyorsa marka ve modelini belirt.
-3. Fotoğraftan görülebilen durumunu değerlendir.
-4. Sıfır ürünse tahmini değer aralığını TL olarak yaz.
-5. İkinci el ise tahmini satış fiyatı aralığını TL olarak yaz.
-6. Koleksiyonluk veya antika olma ihtimali varsa belirt.
-7. Fiyatı etkileyebilecek önemli ayrıntıları söyle.
-8. Emin olmadığın bilgileri kesinmiş gibi yazma.
-
-Cevabı sade, anlaşılır ve çok uzun olmayacak şekilde ver.
-
-En sonda:
-"Tahmini Değer: ... TL - ... TL"
-şeklinde kısa bir özet yaz.
-
-Bu bir görsel tahmindir; kesin ekspertiz sonucu değildir.
-`;
-
-    const openaiCevap = await fetch(
-      "https://api.openai.com/v1/responses",
-      {
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization":
-            `Bearer ${process.env.OPENAI_API_KEY}`
-        },
-
-        body: JSON.stringify({
-          model: "gpt-5.6-luna",
-
-          input: [
-            {
-              role: "user",
-
-              content: [
-                {
-                  type: "input_text",
-                  text: prompt
-                },
-
-                {
-                  type: "input_image",
-                  image_url: image
-                }
-              ]
-            }
-          ],
-
-          max_output_tokens: 700
-        })
-      }
-    );
-
-    const data = await openaiCevap.json();
-
-    if (!openaiCevap.ok) {
-
-      console.error(
-        "OpenAI hatası:",
-        data
-      );
-
-      return res.status(openaiCevap.status).json({
-        error:
-          data?.error?.message ||
-          "Yapay zekâ servisine bağlanılamadı."
-      });
-    }
-
-    let metin = "";
-
-    if (Array.isArray(data.output)) {
-
-      for (const item of data.output) {
-
-        if (
-          item.type === "message" &&
-          Array.isArray(item.content)
-        ) {
-
-          for (const content of item.content) {
-
-            if (
-              content.type === "output_text" &&
-              content.text
-            ) {
-              metin += content.text;
-            }
-          }
-        }
-      }
-    }
-
-    if (!metin) {
-      return res.status(500).json({
-        error:
-          "Yapay zekâ cevap verdi ancak sonuç okunamadı."
-      });
-    }
-
-    return res.status(200).json({
-      message: metin.trim()
-    });
-
-  } catch (hata) {
-
-    console.error(hata);
-
-    return res.status(500).json({
-      error:
-        "Sunucuda beklenmeyen bir hata oluştu."
-    });
-  }
-}__<--->
