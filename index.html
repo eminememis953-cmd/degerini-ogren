@@ -517,6 +517,51 @@ localStorage.setItem("degeriniOgrenHak", JSON.stringify(hakBilgisi));
       );
     }
   </script>
+<script>
+(function () {
+  const ara = document.getElementById("ara");
+  if (!ara || document.getElementById("hakGosterge")) return;
 
+  const hak = document.createElement("div");
+  hak.id = "hakGosterge";
+  hak.style.cssText = "margin:14px 0 10px;text-align:center;font-weight:700;font-size:18px;";
+
+  const pro = document.createElement("button");
+  pro.type = "button";
+  pro.id = "proButon";
+  pro.textContent = "⭐ Pro'ya Geç";
+  pro.style.cssText = "width:100%;margin-bottom:16px;padding:16px;border:0;border-radius:14px;background:#6c4cff;color:white;font-weight:700;font-size:18px;";
+
+  ara.insertAdjacentElement("afterend", pro);
+  ara.insertAdjacentElement("afterend", hak);
+
+  function guncelle() {
+    let bilgi = { tarih: "", kullanim: 0 };
+    try {
+      bilgi = JSON.parse(localStorage.getItem("degeriniOgrenHak") || '{"tarih":"","kullanim":0}');
+    } catch (e) {}
+
+    const bugun = new Date().toISOString().slice(0, 10);
+    const kullanilan = bilgi.tarih === bugun ? Number(bilgi.kullanim || 0) : 0;
+
+    hak.textContent = "🎁 Kalan ücretsiz hakkın: " + Math.max(0, 3 - kullanilan);
+  }
+
+  guncelle();
+
+  const sonuc = document.getElementById("sonuc");
+  if (sonuc) {
+    new MutationObserver(guncelle).observe(sonuc, {
+      childList: true,
+      subtree: true,
+      characterData: true
+    });
+  }
+
+  pro.addEventListener("click", function () {
+    alert("⭐ Pro üyelik çok yakında açılacak.");
+  });
+})();
+</script>
 </body>
 </html>
