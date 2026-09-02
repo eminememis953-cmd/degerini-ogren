@@ -269,7 +269,23 @@
 
           return;
         }
+const bugun = new Date().toISOString().slice(0, 10);
 
+const hakBilgisi = JSON.parse(
+  localStorage.getItem("degeriniOgrenHak") ||
+  '{"tarih":"","kullanim":0}'
+);
+
+if (hakBilgisi.tarih !== bugun) {
+  hakBilgisi.tarih = bugun;
+  hakBilgisi.kullanim = 0;
+}
+
+if (hakBilgisi.kullanim >= 3) {
+  sonuc.textContent =
+    "🔒 Bugünkü 3 ücretsiz hakkın doldu. Yarın tekrar deneyebilirsin.";
+  return;
+}
         ara.disabled = true;
 
         ara.textContent =
@@ -339,7 +355,8 @@
 
           sonuc.textContent =
             gelenSonuc;
-
+hakBilgisi.kullanim += 1;
+localStorage.setItem("degeriniOgrenHak", JSON.stringify(hakBilgisi));
         } catch (hata) {
 
           console.error(hata);
