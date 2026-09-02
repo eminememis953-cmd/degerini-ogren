@@ -57,7 +57,10 @@ Kısa, anlaşılır ve kullanıcı dostu cevap ver.
           model: "openrouter/free",
           messages: [
             {
-              role: "user",
+  role: "system",
+  content: "Yanıtın tamamını yalnızca Türkçe ver. İngilizce açıklama, analiz veya 'The user wants...' gibi ifadeler yazma. Kullanıcıya doğrudan sonucu Türkçe ver."
+},
+    {          role: "user",
               content: [
                 {
                   type: "text",
