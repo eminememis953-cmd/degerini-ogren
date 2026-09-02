@@ -54,12 +54,12 @@ Kısa, anlaşılır ve kullanıcı dostu cevap ver.
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          model: "openrouter/free",
+          model: "minimax/minimax-m3:free",
           messages: [
             {
   role: "system",
   content: "Yanıtın tamamını yalnızca Türkçe ver. İngilizce açıklama, analiz veya 'The user wants...' gibi ifadeler yazma. Kullanıcıya doğrudan sonucu Türkçe ver."
-},
+            },
     {          role: "user",
               content: [
                 {
